@@ -1,0 +1,11 @@
+<project name="ArduinoDevel">
+
+	<target name="Create jar" description="Create jar">
+		<echo>Create jar</echo>
+		<!-- jar -->
+		<jar destfile="lib/java/arons_ant_extension.jar">
+			<fileset dir="build/java/classes" includes="**" />
+		</jar>
+	</target>
+
+</project>

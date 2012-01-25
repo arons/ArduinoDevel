@@ -1,0 +1,113 @@
+<project name="Base Build File">
+
+	
+
+	<!-- define shell ant extension -->
+	<property name="arduinodevel.dir" value="./" />
+	
+	<property file="${arduinodevel.dir}build.properties" />
+	<taskdef name="mytask" classname="ch.arons.ant.ExecShell" classpath="${arduinodevel.dir}lib/java/arons_ant_extension.jar" />
+
+
+
+	<property name="CC" value="${avr.dir}avr-gcc" />
+	<property name="CXX" value="${avr.dir}avr-g++" />
+	<property name="OBJCOPY" value="${avr.dir}avr-objcopy" />
+	<property name="OBJDUMP" value="${avr.dir}avr-objdump" />
+	<property name="AR" value="${avr.dir}avr-ar" />
+	<property name="SIZE" value="${avr.dir}avr-size" />
+	<property name="NM" value="${avr.dir}/avr-nm" />
+	<property name="AVRDUDE" value="${avrdude.dir}avrdude" />
+
+	
+	<!--***********************************************************************************************************-->
+	<property name="dir.target" value="./target/" />
+
+	
+	<target name="lib_c">
+		<echo>c compile:${sourceDir}${fileName}</echo>
+        <mytask shellcommand="${CC} ${CFLAGS} ${INCLUDES} ${sourceDir}${fileName}.c -o ${dir.target}${libName}/${fileName}.o" />
+        <mytask shellcommand="${AR} rcs ${dir.target}${libName}.a ${dir.target}${libName}/${fileName}.o" />
+    </target>
+	<target name="lib_c++">
+        <mytask shellcommand="${CXX} ${CXXFLAGS} ${INCLUDES} ${sourceDir}${fileName}.cpp -o ${dir.target}${libName}/${fileName}.o" />
+        <mytask shellcommand="${AR} rcs ${dir.target}${libName}.a ${dir.target}${libName}/${fileName}.o" />
+    </target>
+	
+	
+	<!--***********************************************************************************************************-->
+	<property name="dir.arduino.source" value=" ${arduinodevel.dir}lib/arduino/core/" />
+	
+	<target name="Core_C">
+		<antcall target="lib_c">
+			<param name="sourceDir" value="${dir.arduino.source}"/>
+			<param name="libName" value="core"/>
+			<param name="fileName" value="${fileName}"/>
+		</antcall>
+	</target>
+	
+	<target name="Core_C++">
+		<antcall target="lib_c++">
+            <param name="sourceDir" value="${dir.arduino.source}"/>
+			<param name="libName" value="core"/>
+            <param name="fileName" value="${fileName}"/>
+        </antcall>
+    </target>
+	
+	<target name="Build Core" description="bild project">
+
+		<delete dir="${dir.target}core"/>
+		<delete file="${dir.target}core.a"/>
+		<mkdir dir="${dir.target}core"/>
+
+		<echo>Core c</echo>
+		<antcall target="Core_C"><param name="fileName" value="WInterrupts"/></antcall>
+		<antcall target="Core_C"><param name="fileName" value="wiring_analog"/></antcall>
+		<antcall target="Core_C"><param name="fileName" value="wiring_digital"/></antcall>
+		<antcall target="Core_C"><param name="fileName" value="wiring_pulse"/></antcall>
+	    <antcall target="Core_C"><param name="fileName" value="wiring_shift"/></antcall>
+	    <antcall target="Core_C"><param name="fileName" value="wiring"/></antcall>
+		
+
+		<echo>Core c++</echo>
+		<antcall target="Core_C++"><param name="fileName" value="CDC"/></antcall>
+		<antcall target="Core_C++"><param name="fileName" value="HardwareSerial"/></antcall>
+		<antcall target="Core_C++"><param name="fileName" value="HID"/></antcall>
+		<antcall target="Core_C++"><param name="fileName" value="IPAddress"/></antcall>
+		<antcall target="Core_C++"><param name="fileName" value="new"/></antcall>
+		<antcall target="Core_C++"><param name="fileName" value="Print"/></antcall>
+		<antcall target="Core_C++"><param name="fileName" value="Stream"/></antcall>
+		<antcall target="Core_C++"><param name="fileName" value="Tone"/></antcall>
+		<antcall target="Core_C++"><param name="fileName" value="USBCore"/></antcall>
+		<antcall target="Core_C++"><param name="fileName" value="WMath"/></antcall>
+		<antcall target="Core_C++"><param name="fileName" value="WString"/></antcall>
+	</target>
+	
+	
+
+	<!--***********************************************************************************************************-->
+	<target name="avr-dude-upload" description="avr-dude-upload">
+		<echo>OBJCOPY</echo>
+		<mytask shellcommand="${AVRDUDE} -v 
+	            -C ${avrdude.dir}avrdude.conf
+	            -c ${dude.programmer} 
+	            -p ${dude.partno}
+	            -b ${dude.baudrate}
+	            -P ${dude.port}
+	            -U flash:w:target/main.hex" />
+	</target>
+
+	<target name="avr-dude-dump" description="avr-dude-dump">
+		<mkdir dir="target" />
+		<echo>dude dump</echo>
+		<mytask shellcommand="${AVRDUDE} -v 
+	                    -C ${avrdude.dir}avrdude.conf
+	                    -c ${dude.programmer} 
+	                    -p ${dude.partno}
+	                    -b ${dude.baudrate}
+	                    -P ${dude.port}
+	                    -U flash:r:target/dump.hex:r" />
+	</target>
+
+
+</project>
