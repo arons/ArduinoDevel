@@ -5,9 +5,9 @@ DEPENDENCIES
 * Linux: 
     - avr: I really suggest to download the avr toolchain from www.atmel.com.
            I've tried to create a correct toolchain with crossdev on Gentoo but any trying was resulting in a non working environment.
-           (the toolchain was successfully created but the result hex was simply not workin after installed on device, only easy code was) 
+           (the toolchain was successfully created but the result hex was simply not working after installed on device, only easy code was) 
            
-           Here the link to my wirking toolchain:
+           Here the link to my working toolchain:
             http://www.atmel.com/dyn/products/tools_card.asp?tool_id=17311&category_id=163&family_id=607&subfamily_id=1965
             
     - avrdude
@@ -19,4 +19,7 @@ DEPENDENCIES
            
            
            
-HOW TO USE            
+HOW TO USE    
+
+there is an example under src/yourproject.
+copy files build.xml and local.properties in your project dir and adjust properties values in your local.properties copy.        
