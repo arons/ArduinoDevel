@@ -54,7 +54,7 @@
         </antcall>
     </target>
 	
-	<target name="Build Core" description="bild project">
+	<target name="Build Core">
 
 		<delete dir="${dir.target}core"/>
 		<delete file="${dir.target}core.a"/>

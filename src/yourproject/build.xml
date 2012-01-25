@@ -6,4 +6,21 @@
 	
 	
 	
+	<!--***********************************************************************************************************-->
+	<target name="Build" description="bild project" depends="Build Core">
+
+
+		<echo>MAIN</echo>
+		<!--<mytask shellcommand="${CXX} ${INCLUDES} -I. -Os -mmcu=${MCU} -DF_CPU=${F_CPU} -Wl,-Map,target/main.map  ./main.cpp -o target/main.elf   /home/arons/workspace/ArduinoTest/target/core.a  -L/target -lm   " />-->
+		<mytask shellcommand="${CXX} ${MAIN_FLAGS} ${INCLUDES}   -o target/main.elf  
+			./main.cpp 
+			 -lm " />
+
+
+		<echo>OBJCOPY</echo>
+		<mytask shellcommand="${OBJCOPY} -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0 target/main.elf target/main.eep" />
+		<mytask shellcommand="${OBJCOPY} -O ihex -R .eeprom target/main.elf target/main.hex " />
+
+	</target>
+	
 </project>
