@@ -54,7 +54,7 @@
         </antcall>
     </target>
 	
-	<target name="Build Core">
+	<target name="build_core">
 
 		<delete dir="${dir.target}core"/>
 		<delete file="${dir.target}core.a"/>
@@ -84,6 +84,19 @@
 	</target>
 	
 	
+	<target name="build_main">
+		
+        <echo>build_main</echo>
+        <mytask shellcommand="${CXX} ${MAIN_FLAGS} ${INCLUDES}  -o target/main.elf  
+            ./main.cpp  target/core.a 
+        	${libLists}
+             -lm " />
+
+        <echo>OBJCOPY</echo>
+        <mytask shellcommand="${OBJCOPY} -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0 target/main.elf target/main.eep" />
+        <mytask shellcommand="${OBJCOPY} -O ihex -R .eeprom target/main.elf target/main.hex " />
+
+	</target>
 
 	<!--***********************************************************************************************************-->
 	<target name="avr-dude-upload" description="avr-dude-upload">

@@ -1,5 +1,9 @@
 Arduino Developing Base Project
 
+USEFUL LINKS
+
+http://www.nongnu.org/avr-libc/user-manual/index.html
+
 
 DEPENDENCIES
 * Linux: 
@@ -22,4 +26,10 @@ DEPENDENCIES
 HOW TO USE    
 
 there is an example under src/yourproject.
-copy files build.xml and local.properties in your project dir and adjust properties values in your local.properties copy.        
+copy files build.xml and local.properties in your project dir and adjust properties values in your local.properties copy.
+
+
+
+TODO 
+- add build with Makefile too
+- docs        
