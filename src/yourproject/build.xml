@@ -1,19 +1,35 @@
 <project name="YourProject">
 
-	<property file="local.properties" />
-	<!-- <include file="${arduinodevel.dir}include-build.xml" as="include"/> -->
-    <import file="${arduinodevel.dir}include-build.xml"/>
+    <property file="local.properties" />
+    <import file="${arduinodevel.dir}include-build.xml" />
+    
+    <property name="INCLUDES" value="${CORE_INCLUDES} -I./lib/example"/>
+
+	<!-- example library -->
+    <target name="example">
+        <antcall target="lib_c++">
+            <param name="sourceDir" value="./lib/example/" />
+            <param name="libName" value="example" />
+            <param name="fileName" value="example" />
+        </antcall>
+    </target>
+
 	
-	
-	
-	<!--***********************************************************************************************************-->
-	<target name="Build" description="bild project">
-		
-		<antcall target="build_core"/>
-		
-	    <antcall target="build_main">
-	    	<param name="libLists" value=""/>
-	    </antcall>
-	</target>
-	
+	<!-- build all lib -->
+    <target name="Build libs" description="build libs">
+        
+    	<!-- delete target dir -->
+        <delete dir="${dir.target}"/>
+        
+        <antcall target="build_core" />
+        <antcall target="example" />
+    </target>
+
+    <!--***********************************************************************************************************-->
+    <target name="Build" description="bild project">
+        <antcall target="build_main">
+            <param name="libLists" value="./target/DHT.a" />
+        </antcall>
+    </target>
+
 </project>

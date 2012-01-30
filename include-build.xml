@@ -25,11 +25,12 @@
 
 	
 	<target name="lib_c">
-		<echo>c compile:${sourceDir}${fileName}</echo>
+		<mkdir dir="${dir.target}${libName}"/>
         <mytask shellcommand="${CC} ${CFLAGS} ${INCLUDES} ${sourceDir}${fileName}.c -o ${dir.target}${libName}/${fileName}.o" />
         <mytask shellcommand="${AR} rcs ${dir.target}${libName}.a ${dir.target}${libName}/${fileName}.o" />
     </target>
 	<target name="lib_c++">
+		<mkdir dir="${dir.target}${libName}"/>
         <mytask shellcommand="${CXX} ${CXXFLAGS} ${INCLUDES} ${sourceDir}${fileName}.cpp -o ${dir.target}${libName}/${fileName}.o" />
         <mytask shellcommand="${AR} rcs ${dir.target}${libName}.a ${dir.target}${libName}/${fileName}.o" />
     </target>
