@@ -1,5 +1,8 @@
 Arduino Developing Base Project
 
+I've started this project in order to be able to easily start develop and test arduino application in eclipse.
+
+
 USEFUL LINKS
 
 http://www.nongnu.org/avr-libc/user-manual/index.html
@@ -25,8 +28,10 @@ DEPENDENCIES
            
 HOW TO USE    
 
-there is an example under src/yourproject.
-copy files build.xml and local.properties in your project dir and adjust properties values in your local.properties copy.
+There is an example under src/yourproject.
+Copy files build.xml and local-sample.properties in your project dir.
+Rename local-sample.properties in local.properties and adjust properties values in it.
+Adjust also build.xml, it contains some example inside how to include external libraries
 
 
 

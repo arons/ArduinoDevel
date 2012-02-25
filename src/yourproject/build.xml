@@ -3,9 +3,11 @@
     <property file="local.properties" />
     <import file="${arduinodevel.dir}include-build.xml" />
     
+	
+	<!-- adjust include -->
     <property name="INCLUDES" value="${CORE_INCLUDES} -I./lib/example"/>
 
-	<!-- example library -->
+	<!-- adjust library name or remove if not necessary -->
     <target name="example">
         <antcall target="lib_c++">
             <param name="sourceDir" value="./lib/example/" />
@@ -17,18 +19,19 @@
 	
 	<!-- build all lib -->
     <target name="Build libs" description="build libs">
-        
-    	<!-- delete target dir -->
         <delete dir="${dir.target}"/>
         
         <antcall target="build_core" />
+    	
+    	<!-- adjust library name or remove if not necessary -->
         <antcall target="example" />
     </target>
 
     <!--***********************************************************************************************************-->
     <target name="Build" description="bild project">
         <antcall target="build_main">
-            <param name="libLists" value="./target/DHT.a" />
+        	<!-- adjust library name or remove if not necessary -->
+            <param name="libLists" value="./target/example.a" />
         </antcall>
     </target>
 
