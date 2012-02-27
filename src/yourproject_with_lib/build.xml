@@ -1,0 +1,38 @@
+<project name="YourProject_with_lib">
+
+    <property file="local.properties" />
+    <import file="${arduinodevel.dir}include-build.xml" />
+    
+	
+	<!-- adjust include -->
+    <property name="INCLUDES" value="${CORE_INCLUDES} -I./lib/MyLib"/>
+
+	<!-- adjust library name or remove if not necessary -->
+    <target name="MyLib">
+        <antcall target="lib_c++">
+            <param name="sourceDir" value="./lib/MyLib/" />
+            <param name="libName" value="MyLib" />
+            <param name="fileName" value="MyLib" />
+        </antcall>
+    </target>
+
+	
+    <target name="Build libs" description="build libs">
+        <delete dir="${dir.target}"/>
+        
+        <antcall target="build_core" />
+    	
+    	<!-- adjust library name or remove if not necessary -->
+        <antcall target="MyLib" />
+    </target>
+
+
+	
+	<target name="Build" description="bild project">
+        <antcall target="build_main">
+        	<!-- adjust library name or remove if not necessary -->
+            <param name="libLists" value="./target/MyLib.a" />
+        </antcall>
+    </target>
+
+</project>

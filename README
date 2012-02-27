@@ -1,7 +1,8 @@
 Arduino Developing Base Project
 
 I've started this project in order to be able to easily start develop and test arduino application in eclipse.
-
+You don't need any additional plugin, all you need is ANT and optional "Eclipse for C/C++ Developers" (if you want syntax highlighting).
+Also you have full control over the build process and is really easy to flash your device.
 
 USEFUL LINKS
 
@@ -31,10 +32,12 @@ HOW TO USE
 There is an example under src/yourproject.
 Copy files build.xml and local-sample.properties in your project dir.
 Rename local-sample.properties in local.properties and adjust properties values in it.
-Adjust also build.xml, it contains some example inside how to include external libraries
 
+There is also an example using additional libraries into src/yourproject_with_lib. 
+Have a look into build.xml, it contains some example inside on how to include external libraries, see comments.
 
+In file build.properties are some pre-defined value for variable: CFLAGS, CXXFLAGS and MAIN_FLAGS.
+You can overwrite them in your local file local.properties.
 
 TODO 
 - add build with Makefile too
-- docs        
