@@ -13,16 +13,23 @@ DEPENDENCIES
 * Linux: 
     - avr: I really suggest to download the avr toolchain from www.atmel.com.
            I've tried to create a correct toolchain with crossdev on Gentoo but any trying was resulting in a non working environment.
-           (the toolchain was successfully created but the result hex was simply not working after installed on device, only easy code was) 
+           (i.e. the toolchain was successfully created but the result hex was simply not working after installed on device, only easy code was like the blink example)  
+           Maybe you can found some useful info here:
+               http://en.gentoo-wiki.com/wiki/Crossdev
+               http://hanez.org/2011/11/23/building-a-working-toolchain-for-avr-and-arduino-development-using-gentoo-linux/
+
+           Also be careful about bug with delay() function:
+               https://wiki.archlinux.org/index.php/Arduino#delay.28.29_function_doesn.27t_work
+           
            
            Here the link to my working toolchain:
-            http://www.atmel.com/dyn/products/tools_card.asp?tool_id=17311&category_id=163&family_id=607&subfamily_id=1965
+               http://www.atmel.com/dyn/products/tools_card.asp?tool_id=17311&category_id=163&family_id=607&subfamily_id=1965
             
     - avrdude
     
 * windows:
     - avr: simply install winavr, it contains all you needs :
-           http://winavr.sourceforge.net/
+          http://winavr.sourceforge.net/
            
            
            
