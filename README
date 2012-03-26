@@ -1,11 +1,12 @@
 Arduino Developing Base Project
 
-I've started this project in order to be able to easily start develop and test arduino application in eclipse.
-You don't need any additional plugin, all you need is ANT and optional "Eclipse for C/C++ Developers" (if you want syntax highlighting).
-Also you have full control over the build process and is really easy to flash your device.
+I've started this project in order to be able to easily start develop and deploy arduino application in eclipse.
+You don't need any additional plugin, all you need is ANT and, optional, "Eclipse for C/C++ Developers" (if you want syntax highlighting).
+
 
 USEFUL LINKS
 
+http://arduino.cc/
 http://www.nongnu.org/avr-libc/user-manual/index.html
 
 
@@ -13,16 +14,19 @@ DEPENDENCIES
 * Linux: 
     - avr: I really suggest to download the avr toolchain from www.atmel.com.
            I've tried to create a correct toolchain with crossdev on Gentoo but any trying was resulting in a non working environment.
-           (the toolchain was successfully created but the result hex was simply not working after installed on device, only easy code was) 
+           (i.e. the toolchain was successfully created but the compiled hex was simply not working on device, only easy code was like the blink example)  
+           Maybe you can found some useful info here:
+               http://en.gentoo-wiki.com/wiki/Crossdev
+               http://hanez.org/2011/11/23/building-a-working-toolchain-for-avr-and-arduino-development-using-gentoo-linux/
            
-           Here the link to my working toolchain:
-            http://www.atmel.com/dyn/products/tools_card.asp?tool_id=17311&category_id=163&family_id=607&subfamily_id=1965
+           Here the link to my working toolchain (I've lost too much time with crossdev):
+               http://www.atmel.com/dyn/products/tools_card.asp?tool_id=17311&category_id=163&family_id=607&subfamily_id=1965
             
     - avrdude
     
 * windows:
     - avr: simply install winavr, it contains all you needs :
-           http://winavr.sourceforge.net/
+          http://winavr.sourceforge.net/
            
            
            
@@ -34,7 +38,7 @@ Copy files build.xml and local-sample.properties in your project dir.
 Rename local-sample.properties in local.properties and adjust properties values in it.
 
 There is also an example using additional libraries into src/yourproject_with_lib. 
-Have a look into build.xml, it contains some example inside on how to include external libraries, see comments.
+Have a look into build.xml, it contains some comments over the necessary ant tasks to include external libraries.
 
 In file build.properties are some pre-defined value for variable: CFLAGS, CXXFLAGS and MAIN_FLAGS.
 You can overwrite them in your local file local.properties.
