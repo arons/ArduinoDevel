@@ -1,25 +1,34 @@
 <project name="Base Build File">
 
-	
-
 	<!-- define shell ant extension -->
-	<property name="arduinodevel.dir" value="./" />
+	<property name="dir.arduinodevel" value="./" />
+
+	<taskdef name="mytask" classname="ch.arons.ant.ExecShell" classpath="${dir.arduinodevel}lib/java/arons_ant_extension.jar" />
+
+
+	<property name="dir.arduino" value="./arduino" />
+    <property name="dir.avrdude" value="${dir.arduino}/hardware/tools"/>
+    <property name="dir.avr" value="${dir.arduino}/hardware/tools/avr/bin" />
+    <property name="dir.arduino.source" value=" ${dir.arduino}/hardware/arduino/cores/arduino/" />
+    <property name="dir.arduino.variants" value=" ${dir.arduino}/hardware/arduino/variants/" />
+    
+    
+	<property name="CC" value="${dir.avr}/avr-gcc" />
+	<property name="CXX" value="${dir.avr}/avr-g++" />
+	<property name="OBJCOPY" value="${dir.avr}/avr-objcopy" />
+	<property name="OBJDUMP" value="${dir.avr}/avr-objdump" />
+	<property name="AR" value="${dir.avr}/avr-ar" />
+	<property name="SIZE" value="${dir.avr}/avr-size" />
+	<property name="NM" value="${dir.avr}/avr-nm" />
+    <property name="AVRDUDE" value="${dir.avrdude}/avrdude" /> 
+
 	
-	<property file="${arduinodevel.dir}build.properties" />
-	<taskdef name="mytask" classname="ch.arons.ant.ExecShell" classpath="${arduinodevel.dir}lib/java/arons_ant_extension.jar" />
+    <property name="CFLAGS" value="-c -g -Os -Wall -ffunction-sections -fdata-sections -mmcu=atmega328p -MMD -DF_CPU=16000000L -DUSB_VID=null -DUSB_PID=null -DARDUINO=105" />
+    <property name="CXXFLAGS" value="-c -g -Os -Wall -fno-exceptions -ffunction-sections -fdata-sections -mmcu=atmega328p -MMD  -DF_CPU=16000000L -DUSB_VID=null -DUSB_PID=null -DARDUINO=105" />
+    <property name="MAIN_FLAGS" value="-Os -Wl,--gc-sections -mmcu=atmega328p -DARDUINO=105" />
+    <property name="CORE_INCLUDES" value="-I${dir.arduino.source} -I${dir.arduino.variants}/standard/" />
 
-
-
-	<property name="CC" value="${avr.dir}avr-gcc" />
-	<property name="CXX" value="${avr.dir}avr-g++" />
-	<property name="OBJCOPY" value="${avr.dir}avr-objcopy" />
-	<property name="OBJDUMP" value="${avr.dir}avr-objdump" />
-	<property name="AR" value="${avr.dir}avr-ar" />
-	<property name="SIZE" value="${avr.dir}avr-size" />
-	<property name="NM" value="${avr.dir}/avr-nm" />
-	<property name="AVRDUDE" value="${avrdude.dir}avrdude" />
-
-	
+    
 	<!--***********************************************************************************************************-->
 	<property name="dir.target" value="./target/" />
 
@@ -37,7 +46,6 @@
 	
 	
 	<!--***********************************************************************************************************-->
-	<property name="dir.arduino.source" value=" ${arduinodevel.dir}lib/arduino/core/" />
 	
 	<target name="Core_C">
 		<antcall target="lib_c">
@@ -83,7 +91,8 @@
 		<antcall target="Core_C++"><param name="fileName" value="WMath"/></antcall>
 		<antcall target="Core_C++"><param name="fileName" value="WString"/></antcall>
 	</target>
-	
+    <!--***********************************************************************************************************-->
+		
 	
 	<target name="build_main">
 		
@@ -103,7 +112,7 @@
 	<target name="avr-dude-upload" description="avr-dude-upload">
 		<echo>OBJCOPY</echo>
 		<mytask shellcommand="${AVRDUDE} -v 
-	            -C ${avrdude.dir}avrdude.conf
+	            -C ${dir.avrdude}/avrdude.conf
 	            -c ${dude.programmer} 
 	            -p ${dude.partno}
 	            -b ${dude.baudrate}
@@ -115,7 +124,7 @@
 		<mkdir dir="target" />
 		<echo>dude dump</echo>
 		<mytask shellcommand="${AVRDUDE} -v 
-	                    -C ${avrdude.dir}avrdude.conf
+	                    -C ${dir.avrdude}/avrdude.conf
 	                    -c ${dude.programmer} 
 	                    -p ${dude.partno}
 	                    -b ${dude.baudrate}

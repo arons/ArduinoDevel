@@ -1,7 +1,7 @@
 <project name="YourProject">
 
     <property file="local.properties" />
-    <import file="${arduinodevel.dir}include-build.xml" />
+    <import file="${dir.arduinodevel}include-build.xml" />
     
 	
 	<!-- include -->
