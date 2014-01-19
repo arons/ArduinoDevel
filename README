@@ -1,8 +1,7 @@
 Arduino Developing Base Project
 
-I've started this project in order to be able to easily start develop and deploy arduino application in eclipse.
-You don't need any additional plugin, all you need is ANT and, optional, "Eclipse for C/C++ Developers" (if you want syntax highlighting).
-
+I've started this project in order to be able to easily start develop and deploy arduino application.
+It exports a base Makefile and ANT tasks.
 
 USEFUL LINKS
 
@@ -11,11 +10,12 @@ http://www.nongnu.org/avr-libc/user-manual/index.html
 
 
 DEPENDENCIES
-Arduino contains all you need: avr and avrdude
+Arduino sdk contains all you need: avr and avrdude
            
 HOW TO USE    
-
 There are two example of simple project under "example" directory.
+
+
 
 
 

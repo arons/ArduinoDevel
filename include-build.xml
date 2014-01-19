@@ -4,12 +4,17 @@
 	<property name="dir.arduinodevel" value="./" />
 
 	<taskdef name="mytask" classname="ch.arons.ant.ExecShell" classpath="${dir.arduinodevel}lib/java/arons_ant_extension.jar" />
+	<taskdef resource="net/sf/antcontrib/antlib.xml" classpath="${dir.arduinodevel}lib/java/ant-contrib-1.0b3.jar" />
 
-
+	
+	<property name="dir.arduino" value="./arduino" />
+	<property name="dir.arduino.source" value="${dir.arduino}/hardware/arduino/cores/arduino" />
+    <property name="dir.arduino.variants" value="${dir.arduino}/hardware/arduino/variants" />
+	<property name="dir.arduino.library" value="${dir.arduino}" />
+	
     <property name="dir.avrdude" value="${dir.arduino}/hardware/tools"/>
     <property name="dir.avr" value="${dir.arduino}/hardware/tools/avr/bin" />
-    <property name="dir.arduino.source" value=" ${dir.arduino}/hardware/arduino/cores/arduino/" />
-    <property name="dir.arduino.variants" value=" ${dir.arduino}/hardware/arduino/variants/" />
+    
     
     
 	<property name="CC" value="${dir.avr}/avr-gcc" />
@@ -22,9 +27,64 @@
     <property name="AVRDUDE" value="${dir.avrdude}/avrdude" /> 
 
 	
-    <property name="CPPFLAGS" value="-Os -Wall -ffunction-sections -fdata-sections -mmcu=atmega328p -MMD -DF_CPU=16000000L -DUSB_VID=null -DUSB_PID=null -DARDUINO=105" />
-    <property name="MAIN_FLAGS" value="-x c++ -Os -Wl,--gc-sections -mmcu=atmega328p -DARDUINO=105" />
-    <property name="CORE_INCLUDES" value="-I${dir.arduino.source} -I${dir.arduino.variants}/standard/" />
+    <property name="CFLAGS" value="-c -g -Os -Wall -ffunction-sections -fdata-sections -mmcu=atmega328p -MMD -DF_CPU=16000000L -DUSB_VID=null -DUSB_PID=null -DARDUINO=105" />
+    <property name="CXXFLAGS" value="-c -g -Os -Wall -fno-exceptions -ffunction-sections -fdata-sections -mmcu=atmega328p -MMD  -DF_CPU=16000000L -DUSB_VID=null -DUSB_PID=null -DARDUINO=105" />
+    <property name="MAIN_FLAGS" value="-x c++ -c -MMD -Os -Wall -ffunction-sections -fdata-sections -fno-exceptions -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums -mmcu=atmega328p  -DF_CPU=16000000L -DUSB_VID= -DUSB_PID= -DARDUINO=105 -include ${dir.arduino.source}/Arduino.h" />
+    <property name="LINK_FLAGS" value="-Os -Wl,--gc-sections -mmcu=atmega328p" />
+    <property name="CORE_INCLUDES" value="-I${dir.arduino.source}/ -I${dir.arduino.variants}/standard/" />
+    
+    
+    <!--***********************************************************************************************************-->
+	<target name="build_core">
+
+		<delete dir="${dir.target}lib"/>
+        <delete file="${dir.target}lib.a"/>
+        <mkdir dir="${dir.target}lib"/>
+        
+		<!-- c -->
+		<for param="fileName">
+		  <path>
+		    <fileset dir="${dir.arduino.source}" includes="**/*.c"/>
+		  </path>
+		  <sequential>
+            <propertyregex override="yes" property="libName"  input="@{fileName}" defaultValue="" regexp="${dir.arduino.source}/([^\.]*)/.*" select="\1"/>
+		    <antcall target="compile_lib_c">
+		        <param name="libName" value="${libName}"/>
+	            <param name="fileName" value="@{fileName}"/>
+	        </antcall>
+		  </sequential>
+        </for>
+        
+		<!-- cpp -->
+        <for param="fileName">
+          <path>
+            <fileset dir="${dir.arduino.source}" includes="**/*.cpp"/>
+          </path>
+          <sequential>
+            <propertyregex override="yes" property="libName"  input="@{fileName}" defaultValue="" regexp="${dir.arduino.source}/([^\.]*)/.*" select="\1"/>
+            <antcall target="compile_lib_c++">
+                <param name="libName" value="${libName}"/>
+                <param name="fileName" value="@{fileName}"/>
+            </antcall>
+          </sequential>
+        </for>
+      
+
+	</target>
+
+    <target name="compile_lib_c">
+        <propertyregex override="yes" property="name"  input="${fileName}" regexp=".*/([^\.]*)\.c" select="\1"/>
+        <mkdir dir="${dir.target}lib/${libName}"/>
+        <mytask shellcommand="${CC} ${CFLAGS} ${INCLUDES} ${fileName} -o ${dir.target}lib/${libName}/${name}.o" />
+        <mytask shellcommand="${AR} rcs ${dir.target}lib.a ${dir.target}lib/${libName}/${name}.o" />
+    </target>
+    <target name="compile_lib_c++">
+        <propertyregex override="yes" property="name"  input="${fileName}" regexp=".*/([^\.]*)\.cpp" select="\1"/>
+        <mkdir dir="${dir.target}lib/${libName}"/>
+        <mytask shellcommand="${CXX} ${CXXFLAGS} ${INCLUDES} ${fileName} -o ${dir.target}lib/${libName}/${name}.o" />
+        <mytask shellcommand="${AR} rcs ${dir.target}lib.a ${dir.target}lib/${libName}/${name}.o" />
+    </target>
+    
     
 
     
@@ -34,73 +94,24 @@
 	
 	<target name="lib_c">
 		<mkdir dir="${dir.target}${libName}"/>
-        <mytask shellcommand="${CC} -c ${CPPFLAGS} ${INCLUDES} ${sourceDir}${fileName}.c -o ${dir.target}${libName}/${fileName}.o" />
+        <mytask shellcommand="${CC} ${CFLAGS} ${INCLUDES} ${sourceDir}${fileName}.c -o ${dir.target}${libName}/${fileName}.o" />
         <mytask shellcommand="${AR} rcs ${dir.target}${libName}.a ${dir.target}${libName}/${fileName}.o" />
     </target>
 	<target name="lib_c++">
 		<mkdir dir="${dir.target}${libName}"/>
-        <mytask shellcommand="${CXX} -c ${CPPFLAGS} ${INCLUDES} ${sourceDir}${fileName}.cpp -o ${dir.target}${libName}/${fileName}.o" />
+        <mytask shellcommand="${CXX} ${CXXFLAGS} ${INCLUDES} ${sourceDir}${fileName}.cpp -o ${dir.target}${libName}/${fileName}.o" />
         <mytask shellcommand="${AR} rcs ${dir.target}${libName}.a ${dir.target}${libName}/${fileName}.o" />
     </target>
 	
 	
 	<!--***********************************************************************************************************-->
-	
-	<target name="Core_C">
-		<antcall target="lib_c">
-			<param name="sourceDir" value="${dir.arduino.source}"/>
-			<param name="libName" value="core"/>
-			<param name="fileName" value="${fileName}"/>
-		</antcall>
-	</target>
-	
-	<target name="Core_C++">
-		<antcall target="lib_c++">
-            <param name="sourceDir" value="${dir.arduino.source}"/>
-			<param name="libName" value="core"/>
-            <param name="fileName" value="${fileName}"/>
-        </antcall>
-    </target>
-	
-	<target name="build_core">
-
-		<delete dir="${dir.target}core"/>
-		<delete file="${dir.target}core.a"/>
-		<mkdir dir="${dir.target}core"/>
-
-		<echo>Core c</echo>
-		<antcall target="Core_C"><param name="fileName" value="WInterrupts"/></antcall>
-		<antcall target="Core_C"><param name="fileName" value="wiring_analog"/></antcall>
-		<antcall target="Core_C"><param name="fileName" value="wiring"/></antcall>
-		<antcall target="Core_C"><param name="fileName" value="wiring_digital"/></antcall>
-		<antcall target="Core_C"><param name="fileName" value="wiring_pulse"/></antcall>
-	    <antcall target="Core_C"><param name="fileName" value="wiring_shift"/></antcall>
-	    
-		
-
-		<echo>Core c++</echo>
-		<antcall target="Core_C++"><param name="fileName" value="CDC"/></antcall>
-		<antcall target="Core_C++"><param name="fileName" value="HardwareSerial"/></antcall>
-		<antcall target="Core_C++"><param name="fileName" value="HID"/></antcall>
-		<antcall target="Core_C++"><param name="fileName" value="IPAddress"/></antcall>
-		<antcall target="Core_C++"><param name="fileName" value="new"/></antcall>
-		<antcall target="Core_C++"><param name="fileName" value="Print"/></antcall>
-		<antcall target="Core_C++"><param name="fileName" value="Stream"/></antcall>
-		<antcall target="Core_C++"><param name="fileName" value="Tone"/></antcall>
-		<antcall target="Core_C++"><param name="fileName" value="USBCore"/></antcall>
-		<antcall target="Core_C++"><param name="fileName" value="WMath"/></antcall>
-		<antcall target="Core_C++"><param name="fileName" value="WString"/></antcall>
-	</target>
-    <!--***********************************************************************************************************-->
 		
 	
 	<target name="build_main">
 		
         <echo>build_main</echo>
-        <mytask shellcommand="${CXX} ${MAIN_FLAGS} ${INCLUDES}  -o target/main.elf  
-            ./main.ino  target/core.a 
-        	${libLists}
-             -lm " />
+        <mytask shellcommand="${CXX} ${MAIN_FLAGS} ${INCLUDES} ./main.ino  -o target/main.o " />
+        <mytask shellcommand="${CC} ${LINK_FLAGS}  target/main.o target/lib.a ${libLists} -lm -o target/main.elf " />
 
         <echo>OBJCOPY</echo>
         <mytask shellcommand="${OBJCOPY} -O ihex -j .eeprom --set-section-flags=.eeprom=alloc,load --no-change-warnings --change-section-lma .eeprom=0 target/main.elf target/main.eep" />
