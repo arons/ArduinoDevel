@@ -1,0 +1,236 @@
+#
+#  Author: Renzo Dani
+#
+#  This library is free software; you can redistribute it and/or
+#  modify it under the terms of the GNU GENERAL PUBLIC LICENSE
+#  License as published by the Free Software Foundation; either
+#  version 2 of the License, or (at your option) any later version.
+#
+#  This library is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+#  See the GNU General Public License for more details.
+#
+#  some few parts are inspired from edam's Arduino makefile (http://ed.am/dev/make/arduino-mk)
+#
+#
+
+ifndef ARDUINODIR
+$(error ARDUINODIR is not set )
+endif
+
+ifndef BOARD
+BOARD := uno
+$(info BOARD is not set. Use deafult value 'uno'. Use 'make boards' to have the list of supported board )
+endif
+
+
+ifdef SystemRoot
+OS := windows
+else
+ifeq ($(shell uname), Linux)
+	OS := linux
+endif
+endif
+
+
+#if not defined, define main file: search for .ino file
+ifndef INOFILE
+INOFILE := $(wildcard *.ino)
+ifneq "$(words $(INOFILE))" "1"
+$(error No .ino file found OR multiple ones!)
+endif
+endif
+
+
+
+DIR_WORK ?= target
+DIR_LIB := $(DIR_WORK)/lib
+
+
+TARGET := $(basename $(INOFILE))
+SOURCES := $(INOFILE) \
+	       $(wildcard *.c *.cc *.cpp *.C) 
+#redirect build to work dir	       
+OBJECTS := $(addprefix $(DIR_WORK)/, $(addsuffix .o, $(basename $(SOURCES))))
+
+
+# default path to find libraries
+LIBRARYPATH ?= libraries libs lib $(ARDUINODIR)/libraries
+# automatically determine included libraries
+LIBRARIES := $(filter $(notdir $(wildcard $(addsuffix /*, $(LIBRARYPATH)))), \
+	$(shell sed -ne "s/^ *\# *include *[<\"]\(.*\)\.h[>\"]/\1/p" $(SOURCES)))
+LIBRARYDIRS := $(foreach lib, $(LIBRARIES), \
+	$(firstword $(wildcard $(addsuffix /$(lib), $(LIBRARYPATH)))))
+
+
+ARDUINO_SDK_VERSION ?= 105
+ARDUINOCOREDIR := $(ARDUINODIR)/hardware/arduino/cores/arduino
+ARDUINOLIB := $(DIR_LIB)/arduino.a
+ARDUINOLIBOBJS := $(foreach dir, $(ARDUINOCOREDIR) $(LIBRARYDIRS), \
+	$(patsubst %, $(DIR_LIB)/%.o, $(wildcard $(addprefix $(dir)/, *.c *.cpp))))
+
+
+#********************************************************************************************************
+# software source
+AVRTOOLSPATH += $(ARDUINODIR)/hardware/tools $(ARDUINODIR)/hardware/tools/avr/bin
+findfile     = $(firstword $(wildcard $(addsuffix /$(1), $(AVRTOOLSPATH))))
+CC 			:= $(call findfile,avr-gcc)
+CXX 		:= $(call findfile,avr-g++)
+LD 			:= $(call findfile,avr-ld)
+AR 			:= $(call findfile,avr-ar)
+OBJCOPY 	:= $(call findfile,avr-objcopy)
+AVRDUDE 	:= $(call findfile,avrdude)
+AVRDUDECONF := $(call findfile,avrdude.conf)
+AVRSIZE 	:= $(call findfile,avr-size)
+SERIALMON 	?= picocom
+
+#board config
+BOARDSFILE := $(ARDUINODIR)/hardware/arduino/boards.txt
+readboardsparam = $(shell sed -ne "s/$(BOARD).$(1)=\(.*\)/\1/p" $(BOARDSFILE))
+BOARD_BUILD_MCU 		:= $(call readboardsparam,build.mcu)
+BOARD_BUILD_FCPU 		:= $(call readboardsparam,build.f_cpu)
+BOARD_USB_VID 			:= $(call readboardsparam,build.vid)
+BOARD_USB_PID 			:= $(call readboardsparam,build.pid)
+BOARD_BUILD_VARIANT 	:= $(call readboardsparam,build.variant)
+BOARD_UPLOAD_PROTOCOL	:= $(call readboardsparam,upload.protocol)
+BOARD_UPLOAD_SPEED		:= $(call readboardsparam,upload.speed)
+
+
+
+# cflags
+CPPFLAGS += -Os -Wall -ffunction-sections -fdata-sections -fno-exceptions
+CPPFLAGS += -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
+#board flags
+CPPFLAGS += -mmcu=$(BOARD_BUILD_MCU) 
+CPPFLAGS += -DF_CPU=$(BOARD_BUILD_FCPU)
+CPPFLAGS += -DUSB_VID=$(BOARD_USB_VID)
+CPPFLAGS += -DUSB_PID=$(BOARD_USB_PID)
+#version 
+CPPFLAGS += -DARDUINO="$(ARDUINO_SDK_VERSION)"
+#includes
+CPPFLAGS += -I. -I $(ARDUINOCOREDIR)
+CPPFLAGS += -I $(ARDUINODIR)/hardware/arduino/variants/$(BOARD_BUILD_VARIANT)/
+CPPFLAGS += $(addprefix -I , $(LIBRARYDIRS))
+
+
+CPPDEPFLAGS = -MMD -MP -MF $(DIR_WORK)/.dep/$<.dep
+
+
+#main flags
+CPPINOFLAGS := -x c++ -include $(ARDUINOCOREDIR)/Arduino.h
+
+
+LINKFLAGS += -Os -Wl,--gc-sections -mmcu=$(BOARD_BUILD_MCU)
+
+
+AVRDUDEFLAGS += $(addprefix -C , $(AVRDUDECONF)) -DV -v
+AVRDUDEFLAGS += -p $(BOARD_BUILD_MCU) -P $(SERIALDEV)
+AVRDUDEFLAGS += -c $(BOARD_UPLOAD_PROTOCOL) -b $(BOARD_UPLOAD_SPEED)
+
+
+#********************************************************************************************************
+# RULES
+#********************************************************************************************************
+.PHONY:	test boards board_info monitor upload dump clean target
+
+# default rule
+.DEFAULT_GOAL := target
+
+test:	
+	@echo "OS: $(OS)"
+	@echo "BOARD: $(BOARD)"
+	@echo "INOFILE: $(INOFILE)"
+	@echo "TARGET: $(TARGET)"
+	@echo "SOURCES: $(SOURCES)"
+	@echo "OBJECTS: $(OBJECTS)"
+	@echo "CPPFLAGS: $(CPPFLAGS)"
+	@echo "CPPDEPFLAGS: $(CPPDEPFLAGS)"
+	@echo "CPPINOFLAGS: $(CPPINOFLAGS)"
+	@echo "LINKFLAGS: $(LINKFLAGS)"
+	@echo ""
+	@echo "AVRDUDE: $(AVRDUDE)"
+	@echo "AVRDUDECONF: $(AVRDUDECONF)"
+
+
+boards:
+	@echo "Available values for BOARD:"
+	@echo ""
+	@echo "  board name = Description"
+	@echo ""
+	@awk 'match($$0, /([^.]+).name=([^.]+)/,a) {printf "%12s = %s\n",a[1],a[2] }' < $(BOARDSFILE)
+
+board_info:
+	@cat $(BOARDSFILE) | grep $(BOARD).
+	
+
+monitor:
+	$(SERIALMON) $(SERIALDEV)	
+
+#********************************************************************************************************	
+upload:
+	$(AVRDUDE) $(AVRDUDEFLAGS) -U flash:w:$(DIR_WORK)/$(TARGET).hex:i
+	
+dump:
+	$(AVRDUDE) $(AVRDUDEFLAGS) -U flash:r:$(DIR_WORK)/dump.hex:r	
+
+#********************************************************************************************************	
+clean:
+	rm -rf $(DIR_WORK)		
+	
+	
+target: $(DIR_WORK)/$(TARGET).hex
+
+#hex
+$(DIR_WORK)/$(TARGET).hex: $(DIR_WORK)/$(TARGET).elf
+	$(OBJCOPY) -O ihex -R .eeprom $< $@
+	
+#elf	
+$(DIR_WORK)/$(TARGET).elf: $(ARDUINOLIB) $(OBJECTS)
+	$(CC) $(LINKFLAGS) $(OBJECTS) $(ARDUINOLIB) -lm -o $@
+	
+	
+#build ino
+$(DIR_WORK)/%.o: %.ino
+	mkdir -p $(DIR_WORK)/.dep/$(dir $<)
+	$(COMPILE.cpp) $(CPPDEPFLAGS) -o $@ $(CPPINOFLAGS) $<
+
+		
+#build sources	
+$(DIR_WORK)/%.o: %.c
+	mkdir -p $(DIR_WORK)/.dep/$(dir $<)
+	$(COMPILE.c) $(CPPDEPFLAGS) -o $@ $<
+
+$(DIR_WORK)/%.o: %.cpp
+	mkdir -p $(DIR_WORK)/.dep/$(dir $<)
+	$(COMPILE.cpp) $(CPPDEPFLAGS) -o $@ $<
+
+$(DIR_WORK)/%.o: %.cc
+	mkdir -p $(DIR_WORK)/.dep/$(dir $<)
+	$(COMPILE.cpp) $(CPPDEPFLAGS) -o $@ $<
+
+$(DIR_WORK)/%.o: %.C
+	mkdir -p $(DIR_WORK)/.dep/$(dir $<)
+	$(COMPILE.cpp) $(CPPDEPFLAGS) -o $@ $<
+
+	
+#build libraries
+$(ARDUINOLIB): $(ARDUINOLIBOBJS)
+	$(AR) rcs $@ $?
+
+$(DIR_LIB)/%.c.o: %.c
+	mkdir -p $(dir $@)
+	$(COMPILE.c) -o $@ $<
+
+$(DIR_LIB)/%.cpp.o: %.cpp
+	mkdir -p $(dir $@)
+	$(COMPILE.cpp) -o $@ $<
+
+$(DIR_LIB)/%.cc.o: %.cc
+	mkdir -p $(dir $@)
+	$(COMPILE.cpp) -o $@ $<
+
+$(DIR_LIB)/%.C.o: %.C
+	mkdir -p $(dir $@)
+	$(COMPILE.cpp) -o $@ $<	
+	

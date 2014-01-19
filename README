@@ -15,15 +15,7 @@ Arduino contains all you need: avr and avrdude
            
 HOW TO USE    
 
-There is an example under src/yourproject.
-Copy files build.xml and local-sample.properties in your project dir.
-Rename local-sample.properties in local.properties and adjust properties values in it.
+There are two example of simple project under "example" directory.
 
-There is also an example using additional libraries into src/yourproject_with_lib. 
-Have a look into build.xml, it contains some comments over the necessary ant tasks to include external libraries.
 
-In file include-build.xml are some pre-defined value for variable: CFLAGS, CXXFLAGS and MAIN_FLAGS.
-You can overwrite them in your local file local.properties.
 
-TODO 
-- add build with Makefile too

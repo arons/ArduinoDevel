@@ -1,0 +1,1 @@
+awk 'match($0, /([^.]+).name=([^.]+)/,a) {printf "%12s = %s\n",a[1],a[2] }' < /home/arons/prog/arduino-1.0.5/hardware/arduino/boards.txt

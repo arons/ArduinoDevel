@@ -6,7 +6,6 @@
 	<taskdef name="mytask" classname="ch.arons.ant.ExecShell" classpath="${dir.arduinodevel}lib/java/arons_ant_extension.jar" />
 
 
-	<property name="dir.arduino" value="./arduino" />
     <property name="dir.avrdude" value="${dir.arduino}/hardware/tools"/>
     <property name="dir.avr" value="${dir.arduino}/hardware/tools/avr/bin" />
     <property name="dir.arduino.source" value=" ${dir.arduino}/hardware/arduino/cores/arduino/" />
@@ -23,10 +22,10 @@
     <property name="AVRDUDE" value="${dir.avrdude}/avrdude" /> 
 
 	
-    <property name="CFLAGS" value="-c -g -Os -Wall -ffunction-sections -fdata-sections -mmcu=atmega328p -MMD -DF_CPU=16000000L -DUSB_VID=null -DUSB_PID=null -DARDUINO=105" />
-    <property name="CXXFLAGS" value="-c -g -Os -Wall -fno-exceptions -ffunction-sections -fdata-sections -mmcu=atmega328p -MMD  -DF_CPU=16000000L -DUSB_VID=null -DUSB_PID=null -DARDUINO=105" />
-    <property name="MAIN_FLAGS" value="-Os -Wl,--gc-sections -mmcu=atmega328p -DARDUINO=105" />
+    <property name="CPPFLAGS" value="-Os -Wall -ffunction-sections -fdata-sections -mmcu=atmega328p -MMD -DF_CPU=16000000L -DUSB_VID=null -DUSB_PID=null -DARDUINO=105" />
+    <property name="MAIN_FLAGS" value="-x c++ -Os -Wl,--gc-sections -mmcu=atmega328p -DARDUINO=105" />
     <property name="CORE_INCLUDES" value="-I${dir.arduino.source} -I${dir.arduino.variants}/standard/" />
+    
 
     
 	<!--***********************************************************************************************************-->
@@ -35,12 +34,12 @@
 	
 	<target name="lib_c">
 		<mkdir dir="${dir.target}${libName}"/>
-        <mytask shellcommand="${CC} ${CFLAGS} ${INCLUDES} ${sourceDir}${fileName}.c -o ${dir.target}${libName}/${fileName}.o" />
+        <mytask shellcommand="${CC} -c ${CPPFLAGS} ${INCLUDES} ${sourceDir}${fileName}.c -o ${dir.target}${libName}/${fileName}.o" />
         <mytask shellcommand="${AR} rcs ${dir.target}${libName}.a ${dir.target}${libName}/${fileName}.o" />
     </target>
 	<target name="lib_c++">
 		<mkdir dir="${dir.target}${libName}"/>
-        <mytask shellcommand="${CXX} ${CXXFLAGS} ${INCLUDES} ${sourceDir}${fileName}.cpp -o ${dir.target}${libName}/${fileName}.o" />
+        <mytask shellcommand="${CXX} -c ${CPPFLAGS} ${INCLUDES} ${sourceDir}${fileName}.cpp -o ${dir.target}${libName}/${fileName}.o" />
         <mytask shellcommand="${AR} rcs ${dir.target}${libName}.a ${dir.target}${libName}/${fileName}.o" />
     </target>
 	
@@ -72,10 +71,11 @@
 		<echo>Core c</echo>
 		<antcall target="Core_C"><param name="fileName" value="WInterrupts"/></antcall>
 		<antcall target="Core_C"><param name="fileName" value="wiring_analog"/></antcall>
+		<antcall target="Core_C"><param name="fileName" value="wiring"/></antcall>
 		<antcall target="Core_C"><param name="fileName" value="wiring_digital"/></antcall>
 		<antcall target="Core_C"><param name="fileName" value="wiring_pulse"/></antcall>
 	    <antcall target="Core_C"><param name="fileName" value="wiring_shift"/></antcall>
-	    <antcall target="Core_C"><param name="fileName" value="wiring"/></antcall>
+	    
 		
 
 		<echo>Core c++</echo>
@@ -98,7 +98,7 @@
 		
         <echo>build_main</echo>
         <mytask shellcommand="${CXX} ${MAIN_FLAGS} ${INCLUDES}  -o target/main.elf  
-            ./main.cpp  target/core.a 
+            ./main.ino  target/core.a 
         	${libLists}
              -lm " />
 
