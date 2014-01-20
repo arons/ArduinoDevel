@@ -5,7 +5,7 @@
     
 	
 	<!-- include -->
-    <property name="INCLUDES" value="${CORE_INCLUDES}"/>
+    <property name="INCLUDES" value=""/>
 
 	
     <target name="Build libs" description="build libs">

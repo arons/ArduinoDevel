@@ -4,8 +4,10 @@
     <import file="${dir.arduinodevel}include-build.xml" />
     
 	
+    
+    
 	<!-- adjust include -->
-    <property name="INCLUDES" value="${CORE_INCLUDES} -I./lib/MyLib"/>
+    <property name="INCLUDES" value="-I./lib/MyLib"/>
 
 	<!-- adjust library name or remove if not necessary -->
     <target name="MyLib">

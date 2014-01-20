@@ -35,19 +35,43 @@
     
     
     <!--***********************************************************************************************************-->
-	<target name="build_core">
-
-		<delete dir="${dir.target}lib"/>
+    
+    <target name="clean" description="clean">
+        <delete dir="${dir.target}"/>
+    </target>
+    
+    <!--***********************************************************************************************************-->
+    
+    <target name="build_core">
+        <delete dir="${dir.target}lib"/>
         <delete file="${dir.target}lib.a"/>
         <mkdir dir="${dir.target}lib"/>
+        
+        <antcall target="build_lib">
+            <param name="dir_lib" value="${dir.arduino.source}"/>
+        </antcall>
+        
+    </target>
+    
+    
+	<target name="build_lib">
+	    
+	    <fail message="Property &quot;foo&quot; needs to be set" unless="dir_lib"/>
+	    
+            
+	    
+        <delete dir="${dir.target}lib"/>
+        <delete file="${dir.target}lib.a"/>
+        <mkdir dir="${dir.target}lib"/>
+		
         
 		<!-- c -->
 		<for param="fileName">
 		  <path>
-		    <fileset dir="${dir.arduino.source}" includes="**/*.c"/>
+		    <fileset dir="${dir_lib}" includes="**/*.c"/>
 		  </path>
 		  <sequential>
-            <propertyregex override="yes" property="libName"  input="@{fileName}" defaultValue="" regexp="${dir.arduino.source}/([^\.]*)/.*" select="\1"/>
+            <propertyregex override="yes" property="libName"  input="@{fileName}" defaultValue="" regexp="${dir_lib}/([^\.]*)/.*" select="\1"/>
 		    <antcall target="compile_lib_c">
 		        <param name="libName" value="${libName}"/>
 	            <param name="fileName" value="@{fileName}"/>
@@ -58,10 +82,10 @@
 		<!-- cpp -->
         <for param="fileName">
           <path>
-            <fileset dir="${dir.arduino.source}" includes="**/*.cpp"/>
+            <fileset dir="${dir_lib}" includes="**/*.cpp"/>
           </path>
           <sequential>
-            <propertyregex override="yes" property="libName"  input="@{fileName}" defaultValue="" regexp="${dir.arduino.source}/([^\.]*)/.*" select="\1"/>
+            <propertyregex override="yes" property="libName"  input="@{fileName}" defaultValue="" regexp="${dir_lib}/([^\.]*)/.*" select="\1"/>
             <antcall target="compile_lib_c++">
                 <param name="libName" value="${libName}"/>
                 <param name="fileName" value="@{fileName}"/>
@@ -75,13 +99,13 @@
     <target name="compile_lib_c">
         <propertyregex override="yes" property="name"  input="${fileName}" regexp=".*/([^\.]*)\.c" select="\1"/>
         <mkdir dir="${dir.target}lib/${libName}"/>
-        <mytask shellcommand="${CC} ${CFLAGS} ${INCLUDES} ${fileName} -o ${dir.target}lib/${libName}/${name}.o" />
+        <mytask shellcommand="${CC} ${CFLAGS} ${CORE_INCLUDES} ${INCLUDES} ${fileName} -o ${dir.target}lib/${libName}/${name}.o" />
         <mytask shellcommand="${AR} rcs ${dir.target}lib.a ${dir.target}lib/${libName}/${name}.o" />
     </target>
     <target name="compile_lib_c++">
         <propertyregex override="yes" property="name"  input="${fileName}" regexp=".*/([^\.]*)\.cpp" select="\1"/>
         <mkdir dir="${dir.target}lib/${libName}"/>
-        <mytask shellcommand="${CXX} ${CXXFLAGS} ${INCLUDES} ${fileName} -o ${dir.target}lib/${libName}/${name}.o" />
+        <mytask shellcommand="${CXX} ${CXXFLAGS} ${CORE_INCLUDES} ${INCLUDES} ${fileName} -o ${dir.target}lib/${libName}/${name}.o" />
         <mytask shellcommand="${AR} rcs ${dir.target}lib.a ${dir.target}lib/${libName}/${name}.o" />
     </target>
     
@@ -94,12 +118,12 @@
 	
 	<target name="lib_c">
 		<mkdir dir="${dir.target}${libName}"/>
-        <mytask shellcommand="${CC} ${CFLAGS} ${INCLUDES} ${sourceDir}${fileName}.c -o ${dir.target}${libName}/${fileName}.o" />
+        <mytask shellcommand="${CC} ${CFLAGS} ${CORE_INCLUDES} ${INCLUDES} ${sourceDir}${fileName}.c -o ${dir.target}${libName}/${fileName}.o" />
         <mytask shellcommand="${AR} rcs ${dir.target}${libName}.a ${dir.target}${libName}/${fileName}.o" />
     </target>
 	<target name="lib_c++">
 		<mkdir dir="${dir.target}${libName}"/>
-        <mytask shellcommand="${CXX} ${CXXFLAGS} ${INCLUDES} ${sourceDir}${fileName}.cpp -o ${dir.target}${libName}/${fileName}.o" />
+        <mytask shellcommand="${CXX} ${CXXFLAGS} ${CORE_INCLUDES} ${INCLUDES} ${sourceDir}${fileName}.cpp -o ${dir.target}${libName}/${fileName}.o" />
         <mytask shellcommand="${AR} rcs ${dir.target}${libName}.a ${dir.target}${libName}/${fileName}.o" />
     </target>
 	
@@ -110,7 +134,7 @@
 	<target name="build_main">
 		
         <echo>build_main</echo>
-        <mytask shellcommand="${CXX} ${MAIN_FLAGS} ${INCLUDES} ./main.ino  -o target/main.o " />
+        <mytask shellcommand="${CXX} ${MAIN_FLAGS} ${CORE_INCLUDES} ${INCLUDES} ./main.ino  -o target/main.o " />
         <mytask shellcommand="${CC} ${LINK_FLAGS}  target/main.o target/lib.a ${libLists} -lm -o target/main.elf " />
 
         <echo>OBJCOPY</echo>
