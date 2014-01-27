@@ -93,9 +93,10 @@ BOARD_BUILD_FCPU 		:= $(call readboardsparam,build.f_cpu)
 BOARD_USB_VID 			:= $(call readboardsparam,build.vid)
 BOARD_USB_PID 			:= $(call readboardsparam,build.pid)
 BOARD_BUILD_VARIANT 	:= $(call readboardsparam,build.variant)
-BOARD_UPLOAD_PROTOCOL	:= $(call readboardsparam,upload.protocol)
 BOARD_UPLOAD_SPEED		:= $(call readboardsparam,upload.speed)
-
+ifndef BOARD_UPLOAD_PROTOCOL
+BOARD_UPLOAD_PROTOCOL	:= $(call readboardsparam,upload.protocol)
+endif
 
 
 # cflags
@@ -125,7 +126,10 @@ LINKFLAGS += -Os -Wl,--gc-sections -mmcu=$(BOARD_BUILD_MCU)
 
 
 AVRDUDEFLAGS += $(addprefix -C , $(AVRDUDECONF)) -DV -v
-AVRDUDEFLAGS += -p $(BOARD_BUILD_MCU) -P $(SERIALDEV)
+AVRDUDEFLAGS += -p $(BOARD_BUILD_MCU)
+ifdef SERIALDEV
+AVRDUDEFLAGS += -P $(SERIALDEV)
+endif
 AVRDUDEFLAGS += -c $(BOARD_UPLOAD_PROTOCOL) -b $(BOARD_UPLOAD_SPEED)
 
 
