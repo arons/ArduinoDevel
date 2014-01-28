@@ -136,12 +136,17 @@ AVRDUDEFLAGS += -c $(BOARD_UPLOAD_PROTOCOL) -b $(BOARD_UPLOAD_SPEED)
 #********************************************************************************************************
 # RULES
 #********************************************************************************************************
-.PHONY:	test boards board_info monitor upload dump clean target
-
+.PHONY:	help config boards board_info monitor upload dump clean target
 # default rule
 .DEFAULT_GOAL := target
+#********************************************************************************************************	
 
-test:	
+help:
+	@echo "targets:"
+	@echo "    help config boards board_info monitor upload dump clean target"
+
+
+config:	
 	@echo "OS: $(OS)"
 	@echo "BOARD: $(BOARD)"
 	@echo "INOFILE: $(INOFILE)"
@@ -156,6 +161,7 @@ test:
 	@echo "AVRDUDE: $(AVRDUDE)"
 	@echo "AVRDUDECONF: $(AVRDUDECONF)"
 
+#********************************************************************************************************	
 
 boards:
 	@echo "Available values for BOARD:"
@@ -166,7 +172,6 @@ boards:
 
 board_info:
 	@cat $(BOARDSFILE) | grep $(BOARD).
-	
 
 monitor:
 	$(SERIALMON) $(SERIALDEV)	
