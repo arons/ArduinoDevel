@@ -14,6 +14,25 @@
 #  some few parts are inspired from edam's Arduino makefile (http://ed.am/dev/make/arduino-mk)
 #
 #
+# MANDATORY:
+#    ARDUINODIR
+#
+# OPTIONAL:
+#    BOARD
+#    DIR_WORK
+#    LIBRARYPATH
+#
+#    BOARD_UPLOAD_PROTOCOL
+#    SERIALDEV
+#
+#    SERIALMON
+#    INOFILE
+#    ARDUINO_SDK_VERSION
+#  
+#    CPPFLAGS
+#    LINKFLAGS
+#    AVRDUDEFLAGS
+#
 
 ifndef ARDUINODIR
 $(error ARDUINODIR is not set )
@@ -21,7 +40,7 @@ endif
 
 ifndef BOARD
 BOARD := uno
-$(info BOARD is not set. Use deafult value 'uno'. Use 'make boards' to have the list of supported board )
+$(info BOARD is not set. Use default value 'uno'. Use 'make boards' to have the list of supported board )
 endif
 
 
@@ -83,6 +102,7 @@ OBJCOPY 	:= $(call findfile,avr-objcopy)
 AVRDUDE 	:= $(call findfile,avrdude)
 AVRDUDECONF := $(call findfile,avrdude.conf)
 AVRSIZE 	:= $(call findfile,avr-size)
+#default serial monitor
 SERIALMON 	?= picocom
 
 #board config
