@@ -178,6 +178,9 @@ upload:
 dump:
 	$(AVRDUDE) $(AVRDUDEFLAGS) -U flash:r:$(DIR_WORK)/dump.hex:r	
 
+erase:
+	$(AVRDUDE) $(AVRDUDEFLAGS) -e 	
+	
 #********************************************************************************************************	
 clean:
 	rm -rf $(DIR_WORK)		
