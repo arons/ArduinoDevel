@@ -69,7 +69,7 @@ DIR_LIB := $(DIR_WORK)/lib
 
 TARGET := $(basename $(INOFILE))
 SOURCES := $(INOFILE) \
-	       $(wildcard *.c *.cc *.cpp *.C) 
+	       $(wildcard *.c *.cc *.cpp *.C)
 #redirect build to work dir	       
 OBJECTS := $(addprefix $(DIR_WORK)/, $(addsuffix .o, $(basename $(SOURCES))))
 
@@ -81,6 +81,7 @@ LIBRARIES := $(filter $(notdir $(wildcard $(addsuffix /*, $(LIBRARYPATH)))), \
 	$(shell sed -ne "s/^ *\# *include *[<\"]\(.*\)\.h[>\"]/\1/p" $(SOURCES)))
 LIBRARYDIRS := $(foreach lib, $(LIBRARIES), \
 	$(firstword $(wildcard $(addsuffix /$(lib), $(LIBRARYPATH)))))
+LIBRARYDIRS += $(addsuffix /utility, $(LIBRARYDIRS))	
 
 
 ARDUINO_SDK_VERSION ?= 105
