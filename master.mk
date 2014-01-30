@@ -81,6 +81,7 @@ LIBRARIES := $(filter $(notdir $(wildcard $(addsuffix /*, $(LIBRARYPATH)))), \
 	$(shell sed -ne "s/^ *\# *include *[<\"]\(.*\)\.h[>\"]/\1/p" $(SOURCES)))
 LIBRARYDIRS := $(foreach lib, $(LIBRARIES), \
 	$(firstword $(wildcard $(addsuffix /$(lib), $(LIBRARYPATH)))))
+LIBRARYDIRS += $(addsuffix /utility, $(LIBRARYDIRS))	
 
 
 ARDUINO_SDK_VERSION ?= 105
@@ -162,9 +163,18 @@ AVRDUDEFLAGS += -c $(BOARD_UPLOAD_PROTOCOL) -b $(BOARD_UPLOAD_SPEED)
 #********************************************************************************************************	
 
 help:
-	@echo "targets:"
-	@echo "    help config boards board_info monitor upload dump clean target"
-
+	@echo "Targets:"
+	@echo ""
+	@echo "help         : prints this help"
+	@echo "config       : prints current config"
+	@echo "boards       : prints available boards"
+	@echo "board_info   : prints current board info"
+	@echo "monitor      : start your serial monitor program (default: picocom) "
+	@echo "upload       : upload your code to board"
+	@echo "dump         : dump code from board"
+	@echo "clean        : clean project"
+	@echo "target       : compile project and generate hex file"
+	
 
 config:	
 	@echo "OS: $(OS)"
