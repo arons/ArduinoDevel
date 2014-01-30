@@ -69,7 +69,7 @@ DIR_LIB := $(DIR_WORK)/lib
 
 TARGET := $(basename $(INOFILE))
 SOURCES := $(INOFILE) \
-	       $(wildcard *.c *.cc *.cpp *.C) 
+	       $(wildcard *.c *.cc *.cpp *.C)
 #redirect build to work dir	       
 OBJECTS := $(addprefix $(DIR_WORK)/, $(addsuffix .o, $(basename $(SOURCES))))
 
