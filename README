@@ -10,10 +10,10 @@ http://www.nongnu.org/avr-libc/user-manual/index.html
 
 
 DEPENDENCIES
-Arduino sdk contains all you need: avr and avrdude
+Arduino sdk contains all you need: avr and avrdude (for both linux and windows)
            
 HOW TO USE    
-There are two example of simple project under "example" directory.
+see the wiki for details.
 
 
 
