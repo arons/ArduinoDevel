@@ -13,7 +13,7 @@ DEPENDENCIES
 Arduino sdk contains all you need: avr and avrdude (for both linux and windows)
            
 HOW TO USE    
-see the wiki for details.
+see the wiki for details or check the example directory: https://github.com/arons/ArduinoDevel/tree/master/example
 
 
 
