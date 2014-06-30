@@ -1,7 +1,8 @@
 Arduino Developing Base Project
 
-I've started this project in order to be able to easily start develop and deploy arduino application.
+I've started this project in order to be able to easily start develop and deploy arduino application on different environments.
 It exports a base Makefile and ANT tasks.
+Any help or suggestion would be greatly appreciated.
 
 USEFUL LINKS
 
