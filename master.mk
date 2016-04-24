@@ -85,7 +85,7 @@ LIBRARYDIRS += $(addsuffix /utility, $(LIBRARYDIRS))
 
 
 ARDUINO_SDK_VERSION ?= 105
-ARDUINOCOREDIR := $(ARDUINODIR)/hardware/arduino/cores/arduino
+ARDUINOCOREDIR := $(ARDUINODIR)/hardware/arduino/avr/cores/arduino
 ARDUINOLIB := $(DIR_LIB)/arduino.a
 ARDUINOLIBOBJS := $(foreach dir, $(ARDUINOCOREDIR) $(LIBRARYDIRS), \
 	$(patsubst %, $(DIR_LIB)/%.o, $(wildcard $(addprefix $(dir)/, *.c *.cpp))))
@@ -107,7 +107,7 @@ AVRSIZE 	:= $(call findfile,avr-size)
 SERIALMON 	?= picocom
 
 #board config
-BOARDSFILE := $(ARDUINODIR)/hardware/arduino/boards.txt
+BOARDSFILE := $(ARDUINODIR)/hardware/arduino/avr/boards.txt
 readboardsparam = $(shell sed -ne "s/$(BOARD).$(1)=\(.*\)/\1/p" $(BOARDSFILE))
 BOARD_BUILD_MCU 		:= $(call readboardsparam,build.mcu)
 BOARD_BUILD_FCPU 		:= $(call readboardsparam,build.f_cpu)
@@ -132,7 +132,7 @@ CPPFLAGS += -DUSB_PID=$(BOARD_USB_PID)
 CPPFLAGS += -DARDUINO="$(ARDUINO_SDK_VERSION)"
 #includes
 CPPFLAGS += -I. -I $(ARDUINOCOREDIR)
-CPPFLAGS += -I $(ARDUINODIR)/hardware/arduino/variants/$(BOARD_BUILD_VARIANT)/
+CPPFLAGS += -I $(ARDUINODIR)/hardware/arduino/avr/variants/$(BOARD_BUILD_VARIANT)/
 CPPFLAGS += $(addprefix -I , $(LIBRARYDIRS))
 
 
