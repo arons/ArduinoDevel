@@ -93,7 +93,7 @@ ARDUINOLIBOBJS := $(foreach dir, $(ARDUINOCOREDIR) $(LIBRARYDIRS), \
 
 #********************************************************************************************************
 # software source
-AVRTOOLSPATH += $(ARDUINODIR)/hardware/tools $(ARDUINODIR)/hardware/tools/avr/bin /usr/bin
+AVRTOOLSPATH += $(ARDUINODIR)/hardware/tools $(ARDUINODIR)/hardware/tools/avr/bin $(ARDUINODIR)/hardware/tools/avr/etc /usr/bin
 findfile     = $(firstword $(wildcard $(addsuffix /$(1), $(AVRTOOLSPATH))))
 CC 			:= $(call findfile,avr-gcc)
 CXX 		:= $(call findfile,avr-g++)
