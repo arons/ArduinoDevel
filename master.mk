@@ -88,7 +88,7 @@ ARDUINO_SDK_VERSION ?= 105
 ARDUINOCOREDIR := $(ARDUINODIR)/hardware/arduino/avr/cores/arduino
 ARDUINOLIB := $(DIR_LIB)/arduino.a
 ARDUINOLIBOBJS := $(foreach dir, $(ARDUINOCOREDIR) $(LIBRARYDIRS), \
-	$(patsubst %, $(DIR_LIB)/%.o, $(wildcard $(addprefix $(dir)/, *.c *.cpp))))
+	$(patsubst %, $(DIR_LIB)/%.o, $(wildcard $(addprefix $(dir)/, *.c *.cpp *.S))))
 
 
 #********************************************************************************************************
@@ -255,6 +255,9 @@ $(DIR_WORK)/%.o: %.C
 	mkdir -p $(DIR_WORK)/.dep/$(dir $<)
 	$(COMPILE.cpp) $(CPPDEPFLAGS) -o $@ $<
 
+$(DIR_WORK)/%.o: %.S
+	mkdir -p $(DIR_WORK)/.dep/$(dir $<)
+	$(COMPILE.cpp) $(CPPDEPFLAGS) -o $@ $<
 	
 #build libraries
 $(ARDUINOLIB): $(ARDUINOLIBOBJS)
@@ -275,4 +278,7 @@ $(DIR_LIB)/%.cc.o: %.cc
 $(DIR_LIB)/%.C.o: %.C
 	mkdir -p $(dir $@)
 	$(COMPILE.cpp) -o $@ $<	
-	
+
+$(DIR_LIB)/%.S.o: %.S
+	mkdir -p $(dir $@)
+	$(COMPILE.cpp) -o $@ $<		
