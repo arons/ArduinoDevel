@@ -81,13 +81,16 @@ LIBRARIES := $(filter $(notdir $(wildcard $(addsuffix /*, $(LIBRARYPATH)))), \
 	$(shell sed -ne "s/^ *\# *include *[<\"]\(.*\)\.h[>\"]/\1/p" $(SOURCES)))
 LIBRARYDIRS := $(foreach lib, $(LIBRARIES), \
 	$(firstword $(wildcard $(addsuffix /$(lib), $(LIBRARYPATH)))))
-LIBRARYDIRS += $(addsuffix /utility, $(LIBRARYDIRS))	
+	
+LIBRARYDIRS_util	= $(addsuffix /utility, $(LIBRARYDIRS))
+LIBRARYDIRS_src  	= $(addsuffix /src, $(LIBRARYDIRS))
+LIBRARYDIRS_src_avr = $(addsuffix /src/avr, $(LIBRARYDIRS))	
 
 
 ARDUINO_SDK_VERSION ?= 105
 ARDUINOCOREDIR := $(ARDUINODIR)/hardware/arduino/avr/cores/arduino
 ARDUINOLIB := $(DIR_LIB)/arduino.a
-ARDUINOLIBOBJS := $(foreach dir, $(ARDUINOCOREDIR) $(LIBRARYDIRS), \
+ARDUINOLIBOBJS := $(foreach dir, $(ARDUINOCOREDIR) $(LIBRARYDIRS) $(LIBRARYDIRS_util) $(LIBRARYDIRS_src) $(LIBRARYDIRS_src_avr), \
 	$(patsubst %, $(DIR_LIB)/%.o, $(wildcard $(addprefix $(dir)/, *.c *.cpp *.S))))
 
 
@@ -124,6 +127,8 @@ endif
 CPPFLAGS += -Os -Wall -ffunction-sections -fdata-sections -fno-exceptions
 CPPFLAGS += -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
 #board flags
+#note: currently avr support only
+CPPFLAGS += -DARDUINO_ARCH_AVR=true
 CPPFLAGS += -mmcu=$(BOARD_BUILD_MCU) 
 CPPFLAGS += -DF_CPU=$(BOARD_BUILD_FCPU)
 CPPFLAGS += -DUSB_VID=$(BOARD_USB_VID)
@@ -133,7 +138,7 @@ CPPFLAGS += -DARDUINO="$(ARDUINO_SDK_VERSION)"
 #includes
 CPPFLAGS += -I. -I $(ARDUINOCOREDIR)
 CPPFLAGS += -I $(ARDUINODIR)/hardware/arduino/avr/variants/$(BOARD_BUILD_VARIANT)/
-CPPFLAGS += $(addprefix -I , $(LIBRARYDIRS))
+CPPFLAGS += $(addprefix -I , $(LIBRARYDIRS) $(LIBRARYDIRS_util) $(LIBRARYDIRS_src) $(LIBRARYDIRS_src_avr))
 
 
 CPPDEPFLAGS = -MMD -MP -MF $(DIR_WORK)/.dep/$<.dep
@@ -190,6 +195,9 @@ config:
 	@echo ""
 	@echo "AVRDUDE: $(AVRDUDE)"
 	@echo "AVRDUDECONF: $(AVRDUDECONF)"
+	@echo ""
+	@echo "LIBRARIES: $(LIBRARIES)"
+	@echo "LIBRARYDIRS: $(LIBRARYDIRS)"
 
 #********************************************************************************************************	
 
