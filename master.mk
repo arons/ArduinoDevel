@@ -19,6 +19,7 @@
 #
 # OPTIONAL:
 #    BOARD
+#    BOARD_CPU
 #    DIR_WORK
 #    LIBRARYPATH
 #
@@ -122,6 +123,29 @@ ifndef BOARD_UPLOAD_PROTOCOL
 BOARD_UPLOAD_PROTOCOL	:= $(call readboardsparam,upload.protocol)
 endif
 
+readboardsparamManu = $(shell sed -ne "s/$(BOARD).menu.cpu.$(BOARD_CPU).$(1)=\(.*\)/\1/p" $(BOARDSFILE))
+ifndef BOARD_BUILD_MCU
+BOARD_BUILD_MCU	:= $(call readboardsparamManu,build.mcu)
+endif
+ifndef BOARD_BUILD_FCPU
+BOARD_BUILD_FCPU	:= $(call readboardsparamManu,build.f_cpu)
+endif
+ifndef BOARD_USB_VID
+BOARD_USB_VID	:= $(call readboardsparamManu,build.vid)
+endif
+ifndef BOARD_USB_PID
+BOARD_USB_PID	:= $(call readboardsparamManu,build.pid)
+endif
+ifndef BOARD_BUILD_VARIANT
+BOARD_BUILD_VARIANT	:= $(call readboardsparamManu,build.variant)
+endif
+ifndef BOARD_UPLOAD_SPEED
+BOARD_UPLOAD_SPEED	:= $(call readboardsparamManu,upload.speed)
+endif
+ifndef BOARD_UPLOAD_PROTOCOL
+BOARD_UPLOAD_PROTOCOL	:= $(call readboardsparamManu,upload.protocol)
+endif
+
 
 # cflags
 CPPFLAGS += -Os -Wall -ffunction-sections -fdata-sections -fno-exceptions
@@ -193,11 +217,21 @@ config:
 	@echo "CPPINOFLAGS: $(CPPINOFLAGS)"
 	@echo "LINKFLAGS: $(LINKFLAGS)"
 	@echo ""
+	@echo "LIBRARIES: $(LIBRARIES)"
+	@echo "LIBRARYDIRS: $(LIBRARYDIRS)"
+	@echo ""
 	@echo "AVRDUDE: $(AVRDUDE)"
 	@echo "AVRDUDECONF: $(AVRDUDECONF)"
 	@echo ""
-	@echo "LIBRARIES: $(LIBRARIES)"
-	@echo "LIBRARYDIRS: $(LIBRARYDIRS)"
+	@echo "BOARDSFILE: $(BOARDSFILE)"
+	@echo "BOARD_BUILD_MCU: $(BOARD_BUILD_MCU)"
+	@echo "BOARD_BUILD_FCPU: $(BOARD_BUILD_FCPU)"
+	@echo "BOARD_USB_VID: $(BOARD_USB_VID)"
+	@echo "BOARD_USB_PID: $(BOARD_USB_PID)"
+	@echo "BOARD_BUILD_VARIANT: $(BOARD_BUILD_VARIANT)"
+	@echo "BOARD_UPLOAD_SPEED: $(BOARD_UPLOAD_SPEED)"
+	
+	
 
 #********************************************************************************************************	
 
