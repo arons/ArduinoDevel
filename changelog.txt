@@ -1,1 +1,7 @@
+added BOARD_CPU parameter in makefile
+
+support for arch library structure
+
+support for arduino 1.6.12
+
 added base Makefile
