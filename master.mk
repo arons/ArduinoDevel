@@ -76,7 +76,7 @@ OBJECTS := $(addprefix $(DIR_WORK)/, $(addsuffix .o, $(basename $(SOURCES))))
 
 
 # default path to find libraries
-LIBRARYPATH ?= libraries libs lib $(ARDUINODIR)/libraries
+LIBRARYPATH ?= libraries libs lib $(ARDUINODIR)/libraries $(ARDUINODIR)/hardware/arduino/avr/libraries
 # automatically determine included libraries
 LIBRARIES := $(filter $(notdir $(wildcard $(addsuffix /*, $(LIBRARYPATH)))), \
 	$(shell sed -ne "s/^ *\# *include *[<\"]\(.*\)\.h[>\"]/\1/p" $(SOURCES)))
